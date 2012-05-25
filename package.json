@@ -1,0 +1,9 @@
+{
+    "name": "qejs",
+    "description": "Asyncronous Embedded JavaScript Templates with Q",
+    "version": "0.0.1",
+    "keywords": ["templating","template","engine","promises","Q","EJS", "JavaScript", "async", "Asyncronous"],
+    "dependencies":{
+        "q":"0.8.5"
+    }
+}
