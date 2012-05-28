@@ -89,7 +89,7 @@ Once you go past the end marker of an async block, you will no longer have acces
 
 ## Newline slurping
 
-if you end any code block with a `-` even if it's an async block, we'll support newline slurping for you (`<% code -%>` or `<% -%>` or `<%= code -%>`, `<%- code -%>`, `<% promise -> result -%>` or `<% < -%>`)  That is to say, we won't output the next new line after we see that symbol.  QEJS never outputs a newline inside a code block.
+If you end any code block with a `-` even if it's an async block, we'll support newline slurping for you (`<% code -%>` or `<% -%>` or `<%= code -%>`, `<%- code -%>`, `<% promise -> result -%>` or `<% < -%>`)  That is to say, we won't output the next new line after we see that symbol.  QEJS never outputs a newline inside a code block.
 
 ## Filters
 
