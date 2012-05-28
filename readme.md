@@ -62,7 +62,7 @@ QEJS supports exactly the same syntax as EJS for unbuffered code, usefull for co
 
 This differs from EJS in that if `code` returns a promise, it is resolved and then escaped before being outputted.  While this is happening, QEJS will continue on to render the rest of the template, allowing many promised functions to be executed in parallel.
 
-## Unescapted Buffering
+## Unescaped Buffering
 
 ```
 <%- code %>
