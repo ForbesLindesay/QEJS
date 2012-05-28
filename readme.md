@@ -101,6 +101,13 @@ QEJS doesn't support filters.  Although in a way it seems a shame not to maintai
 
 I'm really keen to get express integration working, however unfortunately at version 2.x this isn't possible because of our asyncronous rendering, Shims can be made.  However I will endevour to ensure this does support Express.js @ v3.0 as soon as possible after that's released.
 
+## Contribute
+
+Fork this repository to add features or:
+
+<a href="http://flattr.com/thing/699596/QEJS" target="_blank">
+<img src="http://api.flattr.com/button/flattr-badge-large.png" alt="Flattr this" title="Flattr this" border="0" /></a>
+
 ## License 
 
 (The MIT License)
