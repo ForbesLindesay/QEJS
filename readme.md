@@ -89,6 +89,92 @@ What happens in an async block is we reserve a space for whatever text is output
 
 Once you go past the end marker of an async block, you will no longer have access to the value of the promise.  This lets us run lots of calls in parallel, and menas that you can use async blocks inside `if` statments, `for` statements, `while` statements, `functions` statements, pretty much anywhere you could write regular EJS.
 
+## Inheritance and Partials
+
+QEJS supports both inheritance and partials.  Inheritance is used to include the current template in the middle of some other template (similar to express's layout templates except a little more powerful).  Currently this only works if you use the renderFile method (or render in express with the following snippet to setup).
+
+### Configuring express for inheritance and partials
+
+Instead of using consolidate, simply use the following:
+
+```javascript
+app.engine('html', function (path, options, fn) {
+    require('qejs').renderFile(path, options).then(function (result) {
+        fn(null, result);
+    }, function (err) {
+        fn(err);
+    }).end();
+});
+```
+
+I will submit a pull request to get consolidate.js updated as soon as possible.
+
+### Inheritance
+
+Inheritance allows you to support features similar to those in express's layout template.  To use a layout for a template, simply call `inherits('relative/path/to/template')` anywhere in your template that is not run asyncronously.  That is to say, it can't go inside an async block, or inside the then callback of a promise.  Usually it's best to put it at the top of your file.  If you call it multiple times, it will throw an exception.
+
+views/foobar.html
+
+```html
+<% inherits('layouts/navigation') %>
+<p>The great page foobar</p>
+```
+
+layouts/navigation
+
+```html
+<% inherits('base') %>
+<a href="#home">Home</a>
+<a href="#about">About</a>
+<div class="content">
+    <%- contents %>
+</div>
+```
+
+layouts/base
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Document</title>
+    </head>
+    <body>
+        <%- contents %>
+    </body>
+</html>
+```
+
+Be careful not to inherit from yourself as this would create errors that never got caught if you create an infinite loop of inheritance.
+
+As you can see, paths are resolved in a very forgiving way.  They are resolved relative to the current file, then relative to the parent directory of the current directory and so on up the tree until a file is found.  It will try for files with extensions '.qejs', '.ejs' and '.html' in that order unless you specify an extension.
+
+### Partials
+
+You can render a child template within the current template.  By default, it does not currently have access to any local variables of the calling template, only those supplied in options.
+
+To use, simply call render anywhere in the parent template.
+
+layouts/base
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Document</title>
+    </head>
+    <body>
+        <%- render('views/foobar', {message:'hello world'}) %>
+    </body>
+</html>
+```
+
+```html
+<p><%= message %></p>
+```
+
 ## Newline slurping
 
 If you end any code block with a `-` even if it's an async block, we'll support newline slurping for you (`<% code -%>` or `<% -%>` or `<%= code -%>`, `<%- code -%>`, `<% promise -> result -%>` or `<% < -%>`)  That is to say, we won't output the next new line after we see that symbol.  QEJS never outputs a newline inside a code block.
@@ -99,7 +185,49 @@ QEJS doesn't support filters.  Although in a way it seems a shame not to maintai
 
 ## ExpressJS Integration
 
-I'm really keen to get express integration working, however unfortunately at version 2.x this isn't possible because of our asyncronous rendering, Shims can be made.  However I will endevour to ensure this does support Express.js @ v3.0 as soon as possible after that's released.
+This module is fully compatible with [express 3.0.0](https://github.com/visionmedia/express) via the [consolidate.js](https://github.com/visionmedia/consolidate.js) library.
+
+To use it you'll need to install both consolidate and QEJS.  You can do this in a single command with:
+
+    npm install consolidate qejs
+
+The following example demonstrates using QEJS in express:
+
+```javascript
+var express = require('express')
+  , cons = require('consolidate')
+  , app = express();
+
+// assign the swig engine to .html files
+app.engine('html', cons.qejs);
+
+// set .html as the default extension 
+app.set('view engine', 'html');
+app.set('views', __dirname + '/views');
+
+var users = [];
+users.push({ name: 'tobi' });
+users.push({ name: 'loki' });
+users.push({ name: 'jane' });
+
+app.get('/', function(req, res){
+  res.render('index', {
+    title: 'Consolidate.js'
+  });
+});
+
+app.get('/users', function(req, res){
+  res.render('users', {
+    title: 'Users',
+    users: users
+  });
+});
+
+app.listen(3000);
+console.log('Express server listening on port 3000');
+```
+
+If it doesn't work, be sure to make absolutely certain you've got the latest version of express, and make sure you have actually created a users.html and index.html view.
 
 ## Contribute
 
