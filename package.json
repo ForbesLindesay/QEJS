@@ -1,9 +1,35 @@
 {
-    "name": "qejs",
-    "description": "Asyncronous Embedded JavaScript Templates with Q",
-    "version": "0.0.1",
-    "keywords": ["templating","template","engine","promises","Q","EJS", "JavaScript", "async", "Asyncronous"],
-    "dependencies":{
-        "q":"0.8.5"
-    }
+  "name": "qejs",
+  "description": "Asyncronous Embedded JavaScript Templates with Q",
+  "version": "1.0.1",
+  "keywords": [
+    "templating",
+    "template",
+    "engine",
+    "promises",
+    "Q",
+    "EJS",
+    "JavaScript",
+    "async",
+    "Asyncronous"
+  ],
+  "dependencies": {
+    "q": "0.8.5"
+  },
+  "devDependencies": {
+    "test": "*"
+  },
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  },
+  "author": "JEPSO <contact@jepso.com> (http://www.jepso.com)",
+  "homepage": "http://substance.io/forbeslindesay/qejs",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jepso/QEJS.git"
+  },
+  "scripts": {
+    "test": "node test/index.js"
+  }
 }
