@@ -75,10 +75,10 @@ If `code` isn't a promise, this will work exactly like EJS, but if `code` is a p
 ## Async Blocks
 
 ```
-<% promise -> value %>...Use value here...<% < %>
-<% PromiseForAnArray -> [valueA, valueB, valueC...] %>...Use values individually here...<% < %>
-<% [promiseA,promiseB,promiseC...] -> values %>...Use identifier as an array of resolved values...<% < %>
-<% [promiseA,promiseB,promiseC...] -> [valueA,valueB,valueC...] %>...Use values individually here...<% < %>
+<% promise -> value %>...Use value here...<% <- %>
+<% PromiseForAnArray -> [valueA, valueB, valueC...] %>...Use values individually here...<% <- %>
+<% [promiseA,promiseB,promiseC...] -> values %>...Use identifier as an array of resolved values...<% <- %>
+<% [promiseA,promiseB,promiseC...] -> [valueA,valueB,valueC...] %>...Use values individually here...<% <- %>
 ```
 
 Async blocks are considered a relatively advanced feature, and where possible you should try and tick to just returning promises through `<%= code %>` as it's much easier to write that without creating bugs.
@@ -87,7 +87,7 @@ Having said that, async blocks are not difficult to write and I hope you'll end 
 
 What happens in an async block is we reserve a space for whatever text is outputted by the block, allowing you to use any QEJS inside the async block (including another async block).  We then resolve the value of the promise you give us, and we give it the name you specify on the right hand side of the arrow operator.  The async block starter must go in its own separate unbuffered code block, but you could put other things like comments inside the block with the end marker.
 
-Once you go past the end marker of an async block, you will no longer have access to the value of the promise.  This lets us run lots of calls in parallel, and menas that you can use async blocks inside `if` statments, `for` statements, `while` statements, `functions` statements, pretty much anywhere you could write regular EJS.
+Once you go past the end marker of an async block, you will no longer have access to the value of the promise.  This lets us run lots of calls in parallel, and means that you can use async blocks inside `if` statments, `for` statements, `while` statements, `function` statements, pretty much anywhere you could write regular EJS.
 
 ## Inheritance and Partials
 
