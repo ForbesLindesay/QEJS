@@ -1,7 +1,7 @@
 {
   "name": "qejs",
   "description": "Asyncronous Embedded JavaScript Templates with Q",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "keywords": [
     "templating",
     "template",
@@ -17,7 +17,8 @@
     "q": "0.8.5"
   },
   "devDependencies": {
-    "test": "*"
+    "mocha": "*",
+    "should": "*"
   },
   "optionalDependencies": {},
   "engines": {
@@ -30,6 +31,7 @@
     "url": "git://github.com/jepso/QEJS.git"
   },
   "scripts": {
-    "test": "node test/index.js"
+    "prepublish": "mocha",
+    "test": "mocha"
   }
 }

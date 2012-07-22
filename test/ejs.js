@@ -9,7 +9,7 @@ var ejs = require('..')
   , Q = require('q');
 
 function fixturePath(name) {
-  return 'test/ejs-fixtures/' + name;
+  return __dirname + '/ejs-fixtures/' + name;
 }
 /**
  * Load fixture `name`.
@@ -178,6 +178,9 @@ users.push({ name: 'jane' });
     })
   })
 
+/*
+//QEJS has it's own syntax for includes and inheritance which has yet to be unified with QEJS
+
   describe('includes', function(){
     it('should include ejs', function(){
       var file = 'test/fixtures/include.ejs';
@@ -198,6 +201,7 @@ users.push({ name: 'jane' });
         .should.equal(fixture('include.css.html'));
     })
   })
+ */
 }(function (name, fn) {
   it(name, function (done) {
     var resref = [];
