@@ -50,6 +50,9 @@ function all(promises) {
  * @api public
  */
 exports.escape = function(html){
+  if (Q.isPromise(html)) {
+    return html.then(escape);
+  }
   return String(html)
     .replace(/&(?!\w+;)/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -149,8 +152,8 @@ var parse = exports.parse = function(str, options){
       var prefix, postfix, line = '__stack.lineno=' + lineno;
       switch (str.substr(i, 1)) {
         case '=':
-          prefix = "', Q.when((" + line + ', ';
-          postfix = "),escape), '";
+          prefix = "', escape((" + line + ', ';
+          postfix = ")), '";
           ++i;
           break;
         case '-':
@@ -248,13 +251,15 @@ var parse = exports.parse = function(str, options){
           var manyIn = (/^\s*\[.*\]\s*$/g).test(input);
           var manyOut = (/^\s*\[.*\]\s*$/g).test(output);
           if(manyIn){
-            input = "all(" + input + ")";
+            input = 'all(' + input + ')';
+          } else {
+            input = 'Q.when(' + input + ')';
           }
           if(manyOut){
             output = (/^\s*\[(.*)\]\s*$/g).exec(output)[1];
-            prefix = "', (" + line + ', (function(buf){return Q.when(' + input + ').spread(function(';
+            prefix = "', (" + line + ', (function(buf){return ' + input + '.spread(function(';
           }else{
-            prefix = "', (" + line + ', (function(buf){return Q.when(' + input + ', function(';
+            prefix = "', (" + line + ', (function(buf){return ' + input + '.then(function(';
           }
           js = output;
           postfix = '){'+"buf.push('";
@@ -264,7 +269,7 @@ var parse = exports.parse = function(str, options){
         var split = searchAndSplit(js, '<-');
         if(split){
           prefix += split[0];
-          prefix += "/*BLAH*/;}).then(function(){return all(buf).invoke('join','')});}([]))));"
+          prefix += ";return all(buf).invoke('join','')});}([]))));"
           js = split[1];
         }
       }());
@@ -384,8 +389,6 @@ exports.renderFile = function(path, options, source){
 
   options = options||{};
 
-  options.filename = path;
-
 
   if(typeof options.render === 'undefined'){
     options.render = function (subpath, suboptions) {
@@ -406,9 +409,7 @@ exports.renderFile = function(path, options, source){
     };
   }
 
-  return Q.resolve().then(function(){
-    return resolverRead(options.cache, path, source);
-  }).then(function(file){
+  return resolverRead(options.cache, path, source).then(function (file) {
       options.filename = file.path;
       var inner = exports.render(file.str, options);
       if (inherits) {
