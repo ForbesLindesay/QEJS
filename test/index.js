@@ -99,10 +99,26 @@ var countries = Q.when(['England', 'Scotland', 'Wales']);
       }));
     });
   });
+
+  describe('inheritance', function () {
+    it('works regardless of how long the chain of inheriting templates is', function () {
+      return qejs.renderFile(fixturePath('inherit-C.qejs')).then(function (val) {
+        val.should.equal('ABC');
+      });
+    });
+  });
+
+  describe('rendering large files', function () {
+    it('is still quick', function () {
+      this.timeout(10);
+      return qejs.renderFile(fixturePath('long.qejs')).then(function (val) {
+      });
+    });
+  });
 }(function (name, fn) {
   it(name, function (done) {
     var resref = [];
-    var res = fn(resref);
+    var res = fn.call(this, resref);
     if (Array.isArray(res)) {
       res = Q.all(res);
     }
