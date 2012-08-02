@@ -16,7 +16,7 @@ function fixturePath(name) {
  */
 
 function fixture(name) {
-  return read(fixturePath(name), 'utf8');
+  return read(fixturePath(name), 'utf8').replace(/\r\n/g, '\n');
 }
 
 /**

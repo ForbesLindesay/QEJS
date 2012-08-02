@@ -51,7 +51,7 @@ function all(promises) {
  */
 exports.escape = function(html){
   if (Q.isPromise(html)) {
-    return html.then(escape);
+    return html.then(exports.escape);
   }
   return String(html)
     .replace(/&(?!\w+;)/g, '&amp;')

@@ -1,29 +1,3 @@
-var s = {  'test promises': function (assert, done) {
-    var stream = testStream(assert, done);
-    var options = {
-      delay:function(input){
-        var def = Q.defer();
-        setTimeout(function(){def.resolve(input);}, 0);
-        return def.promise;
-      }
-    }
-    stream.equal(expected, qejs.render(str, options));
-    var expected = '1,2,3',
-      str = '<% [delay(1),delay(2),delay(3)] -> input %><%=input.join()%><% < %>'
-    stream.equal(expected, qejs.render(str, options));
-    var expected = '1,2,3',
-      str = '<% delay([1,2,3]) -> [A,B,C] %><%=A+","+B+","+C%><% < %>'
-    stream.equal(expected, qejs.render(str, options));
-    var expected = '1,2,3',
-      str = '<% [delay(1),delay(2),delay(3)] -> [A,B,C] %><%=A+","+B+","+C%><% < %>'
-    stream.equal(expected, qejs.render(str, options));
-
-    stream.done();
-  } }
-
-
-
-
 /**
  * Module dependencies.
  */
@@ -50,7 +24,7 @@ function fixture(name) {
  */
 
 var users = [];
-users.push(Q.when({ name: 'tobi' }));
+users.push(Q.when({ name: 'tobi smith' }));
 users.push(Q.when({ name: 'loki' }));
 users.push(Q.when({ name: 'jane' }));
 
@@ -60,12 +34,12 @@ var countries = Q.when(['England', 'Scotland', 'Wales']);
   describe('implicit promise resolution', function () {
     it('works when escaping', function () {
       return qejs.render('<% users.forEach(function (user) { %><%= user.get("name") %><% }) %>', {users: users}).then(function (val) {
-        val.should.equal('tobilokijane');
+        val.should.equal('tobi smithlokijane');
       });
     });
     it('works when not escaping', function () {
       return qejs.render('<% users.forEach(function (user) { %><%- user.get("name") %><% }) %>', {users: users}).then(function (val) {
-        val.should.equal('tobilokijane');
+        val.should.equal('tobi smithlokijane');
       });
     });
   });
@@ -110,7 +84,7 @@ var countries = Q.when(['England', 'Scotland', 'Wales']);
 
   describe('rendering large files', function () {
     it('is still quick', function () {
-      this.timeout(10);
+      this.timeout(20);
       return qejs.renderFile(fixturePath('long.qejs')).then(function (val) {
       });
     });
