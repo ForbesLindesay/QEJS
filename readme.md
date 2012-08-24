@@ -93,22 +93,6 @@ Once you go past the end marker of an async block, you will no longer have acces
 
 QEJS supports both inheritance and partials.  Inheritance is used to include the current template in the middle of some other template (similar to express's layout templates except a little more powerful).  Currently this only works if you use the renderFile method (or render in express with the following snippet to setup).
 
-### Configuring express for inheritance and partials
-
-Instead of using consolidate, simply use the following:
-
-```javascript
-app.engine('html', function (path, options, fn) {
-    require('qejs').renderFile(path, options).then(function (result) {
-        fn(null, result);
-    }, function (err) {
-        fn(err);
-    }).end();
-});
-```
-
-I will submit a pull request to get consolidate.js updated as soon as possible.
-
 ### Inheritance
 
 Inheritance allows you to support features similar to those in express's layout template.  To use a layout for a template, simply call `inherits('relative/path/to/template')` anywhere in your template that is not run asyncronously.  That is to say, it can't go inside an async block, or inside the then callback of a promise.  Usually it's best to put it at the top of your file.  If you call it multiple times, it will throw an exception.
