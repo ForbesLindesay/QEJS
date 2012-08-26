@@ -5,15 +5,12 @@
  * MIT Licensed
  */
 
+var resolverRead = require('./lib/filesystem.js').resolverRead;
+
 /**
  * Module dependencies.
  */
-
-if(typeof window === 'undefined'){
-  var Q = require('q');
-} else {
-  var Q = window.Q;
-}
+var Q = require('q');
 
 function all(promises) {
   return Q.when(promises, function (promises) {
@@ -49,15 +46,14 @@ function all(promises) {
  * @return {String}
  * @api public
  */
-exports.escape = function(html){
-  if (Q.isPromise(html)) {
-    return html.then(exports.escape);
-  }
-  return String(html)
-    .replace(/&(?!\w+;)/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+exports.escape = function escape(html){
+  return when(html, function (html) {
+    return String(html)
+      .replace(/&(?!\w+;)/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  });
 };
  
 
@@ -409,7 +405,7 @@ exports.renderFile = function(path, options, source){
     };
   }
 
-  return resolverRead(options.cache, path, source).then(function (file) {
+  return when(resolverRead(options.cache, path, source), function (file) {
       options.filename = file.path;
       var inner = exports.render(file.str, options);
       if (inherits) {
@@ -425,68 +421,10 @@ exports.renderFile = function(path, options, source){
   });
 };
 
-function resolverRead(cacheEnabled, to, from){
-  try{
-    var fs = require('fs');
-  }catch(ex){
-    throw new Error("couldn't load file system module");
+function when(promise, callback, errback) {
+  if (Q.isFulfilled(promise)) {
+    return Q.resolve(callback(Q.nearer(promise)));
+  } else  {
+    return promise.then(callback, errback);
   }
-  var read = Q.nbind(fs.readFile,fs);
-  function readFile(path) {
-    if(cacheEnabled && cache[path + ':string']){
-      return cache[path + ':string']
-    }
-    return cacheEnabled?(cache[path + ':string']=read(path, 'utf8')):read(path, 'utf8');
-  }
-  var resolver = pathResolveOrder(to, from);
-  var paths = [];
-  function next(){
-    var path = resolver.next();
-    if(path){
-      paths.push('      - '+path);
-      return readFile(path).then(function (str){
-        return {str:str, path:path};
-      }).fail(function(){
-        return next();
-      });
-    } else {
-      return Q.reject(new Error("No file could be resolved for '" + to + "' from '"+from+"'\n    The following paths were tried: \n" + paths.join("\n")));
-    }
-  }
-  return next();
-}
-function pathResolveOrder(to, from){
-  var path = require('path');
-  var i = -1;
-  var extnames;
-  if(!from){
-    return {next: function () {
-      i++;
-      if (i > 0) return false;
-      else return to;
-    }};
-  }
-
-
-  if (path.extname(to) === '') {
-    extnames = ['.qejs', '.ejs', '.html'];
-  } else {
-    extnames = [''];
-  } 
-
-  var dirname = path.dirname(from);
-
-  var root = path.dirname(require.main.filename);
-  function next(){
-    i++;
-    if(i === extnames.length){
-      i = 0;
-      var old = dirname;
-      dirname = path.join(dirname, '..');
-      if(old === dirname) return false;
-    }
-    return path.join(dirname, to)+extnames[i];
-  }
-
-  return {next:next};
 }

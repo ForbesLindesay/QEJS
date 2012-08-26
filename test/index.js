@@ -89,6 +89,30 @@ var countries = Q.when(['England', 'Scotland', 'Wales']);
       });
     });
   });
+  describe('rendering lots of inherited files', function () {
+    it('is still quick', function () {
+      this.timeout(150);
+      var p = qejs.renderFile(fixturePath('inherit-C.qejs'), {cache: true}).then(function (val) {
+        val.should.equal('ABC');
+      });
+      for (var i = 0; i < 100; i++) {
+        p = when(p, function () {
+          return when(qejs.renderFile(fixturePath('inherit-C.qejs'), {cache: true}), function (val) {
+            val.should.equal('ABC');
+          });
+        });
+      }
+      return p;
+      function when(promise, callback, errback) {
+        if (Q.isFulfilled(promise)) {
+          console.log('sync');
+          return Q.resolve(callback(Q.nearer(promise)));
+        } else  {
+          return promise.then(callback, errback);
+        }
+      }
+    });
+  });
 }(function (name, fn) {
   it(name, function (done) {
     var resref = [];
