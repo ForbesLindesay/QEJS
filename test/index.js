@@ -91,7 +91,7 @@ var countries = Q.when(['England', 'Scotland', 'Wales']);
   });
   describe('rendering lots of inherited files', function () {
     it('is still quick', function () {
-      this.timeout(150);
+      this.timeout(180);
       var p = qejs.renderFile(fixturePath('inherit-C.qejs'), {cache: true}).then(function (val) {
         val.should.equal('ABC');
       });
