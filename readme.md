@@ -1,3 +1,4 @@
+[![Build Status](https://secure.travis-ci.org/jepso/QEJS.png?branch=master)](http://travis-ci.org/jepso/QEJS)
 # Asyncronous Embedded JavaScript Templates with Q
 
 ![QEJS](http://i.imgur.com/WRIlB.png)
