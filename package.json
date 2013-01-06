@@ -1,7 +1,7 @@
 {
   "name": "qejs",
   "description": "Asyncronous Embedded JavaScript Templates with Q",
-  "version": "2.0.8",
+  "version": "3.0.0",
   "keywords": [
     "templating",
     "template",
