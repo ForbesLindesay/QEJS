@@ -214,6 +214,6 @@ users.push({ name: 'jane' });
     }
     Q.when(res, function () {
       done();
-    }, done).end();
+    }, done).done();
   });
 }));
