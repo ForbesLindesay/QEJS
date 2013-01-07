@@ -351,8 +351,27 @@ var compile = exports.compile = function(str, options){
  */
 exports.render = function(str, options){
   try{
-    var fn
-      , options = options || {};
+    var fn, options = options || {};
+
+
+    if (typeof options.render === 'undefined' && options.filename) {
+      options.render = function (subpath, suboptions) {
+        suboptions = (suboptions || {});
+        Object.keys(options).forEach(function (key) {
+          if(key !== 'inherits' && key !== 'render' && typeof suboptions[key] === 'undefined') suboptions[key] = options[key];
+        });
+        return exports.renderFile(subpath, (suboptions || options), options.filename);
+      };
+    }
+
+    var inherits = null;
+    if(typeof options.inherits === 'undefined' && options.filename) {
+      options.inherits = function (path) {
+        if(inherits !== null) throw new Error("It is an error to call inherits multiple times from one QEJS file");
+        inherits = path;
+        return path;
+      };
+    }
 
     if (options.cache) {
       if (options.filename) {
@@ -365,7 +384,18 @@ exports.render = function(str, options){
     }
 
     options.__proto__ = options.locals;
-    return fn.call(options.scope, options);
+
+    var inner = fn.call(options.scope, options);
+    if (inherits && options.filename) {
+      var parentoptions = {};
+      Object.keys(options).forEach(function (key) {
+        if(key !== 'inherits' && key !== 'render') parentoptions[key] = options[key];
+      });
+      parentoptions.contents = inner;
+      return exports.renderFile(inherits, parentoptions, options.filename);
+    } else {
+      return inner;
+    }
   }catch (ex){
     return Q.reject(ex);
   }
@@ -383,42 +413,15 @@ exports.render = function(str, options){
 exports.renderFile = function(path, options, source){
   var key = path + ':string';
 
-  options = options||{};
+  options = options || {};
 
-
-  if(typeof options.render === 'undefined'){
-    options.render = function (subpath, suboptions) {
-      suboptions = (suboptions || {});
-      Object.keys(options).forEach(function (key) {
-        if(key !== 'inherits' && key !== 'render' && typeof suboptions[key] === 'undefined') suboptions[key] = options[key];
-      });
-      return exports.renderFile(subpath, (suboptions || options), options.filename);
-    };
+  try {
+    var file = resolverRead(options.cache, path, source);
+    options.filename = file.path;
+    return exports.render(file.str, options);
+  } catch (ex) {
+    return Q.reject(ex);
   }
-
-  var inherits = null;
-  if(typeof options.inherits === 'undefined') {
-    options.inherits = function (path) {
-      if(inherits !== null) throw new Error("It is an error to call inherits multiple times from one QEJS file");
-      inherits = path;
-      return path;
-    };
-  }
-
-  return when(resolverRead(options.cache, path, source), function (file) {
-      options.filename = file.path;
-      var inner = exports.render(file.str, options);
-      if (inherits) {
-        var parentoptions = {};
-        Object.keys(options).forEach(function (key) {
-          if(key !== 'inherits' && key !== 'render') parentoptions[key] = options[key];
-        });
-        parentoptions.contents = inner;
-        return exports.renderFile(inherits, parentoptions, options.filename);
-      } else {
-        return inner;
-      }
-  });
 };
 
 function when(promise, callback, errback) {

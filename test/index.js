@@ -84,33 +84,24 @@ var countries = Q.when(['England', 'Scotland', 'Wales']);
 
   describe('rendering large files', function () {
     it('is still quick', function () {
-      this.timeout(20);
-      return qejs.renderFile(fixturePath('long.qejs')).then(function (val) {
-      });
+      this.timeout(800);//10ms per render
+      return repeat(function () {
+        return qejs.renderFile(fixturePath('long.qejs')).then(function (val) {
+        });
+      }, 100);
     });
   });
   describe('rendering lots of inherited files', function () {
     it('is still quick', function () {
-      this.timeout(600);//this needs to be improved
+      this.timeout(800);//10ms per render
       var p = qejs.renderFile(fixturePath('inherit-C.qejs'), {cache: true}).then(function (val) {
         val.should.equal('ABC');
       });
-      for (var i = 0; i < 100; i++) {
-        p = when(p, function () {
-          return when(qejs.renderFile(fixturePath('inherit-C.qejs'), {cache: true}), function (val) {
-            val.should.equal('ABC');
-          });
+      return repeat(function () {
+        return qejs.renderFile(fixturePath('inherit-C.qejs'), {cache: true}).then(function (val) {
+          val.should.equal('ABC');
         });
-      }
-      return p;
-      function when(promise, callback, errback) {
-        if (Q.isFulfilled(promise)) {
-          console.log('sync');
-          return Q.resolve(callback(Q.nearer(promise)));
-        } else  {
-          return promise.then(callback, errback);
-        }
-      }
+      }, 100);
     });
   });
 }(function (name, fn) {
@@ -128,3 +119,11 @@ var countries = Q.when(['England', 'Scotland', 'Wales']);
     }, done).done();
   });
 }));
+
+function repeat(fn, n) {
+  var p = fn(0);
+  for (var i = 1; i < n; i++) {
+    p = p.then(function () { return fn(i); })
+  }
+  return p;
+}
