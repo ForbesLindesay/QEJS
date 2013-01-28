@@ -325,7 +325,17 @@ var compile = exports.compile = function(str, options){
   ].join("\n");
   
   if (options.debug) console.log(str);
-  var fn = new Function('locals, escape, Q, all', str);
+
+  try {
+    var fn = new Function('locals, escape, Q, all', str);
+  } catch (err) {
+    if ('SyntaxError' == err.name) {
+      err.message += options.filename
+        ? ' in ' + filename
+        : ' while compiling qejs';
+    }
+    throw err;
+  }
   return function(locals){
     return fn.call(this, locals || {}, exports.escape, Q, all);
   }
