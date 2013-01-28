@@ -84,7 +84,7 @@ var countries = Q.when(['England', 'Scotland', 'Wales']);
 
   describe('rendering large files', function () {
     it('is still quick', function () {
-      this.timeout(800);//10ms per render
+      this.timeout(1600);//20ms per render
       return repeat(function () {
         return qejs.renderFile(fixturePath('long.qejs')).then(function (val) {
         });
@@ -93,7 +93,7 @@ var countries = Q.when(['England', 'Scotland', 'Wales']);
   });
   describe('rendering lots of inherited files', function () {
     it('is still quick', function () {
-      this.timeout(800);//10ms per render
+      this.timeout(1600);//20ms per render
       var p = qejs.renderFile(fixturePath('inherit-C.qejs'), {cache: true}).then(function (val) {
         val.should.equal('ABC');
       });
