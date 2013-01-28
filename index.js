@@ -258,14 +258,14 @@ var parse = exports.parse = function(str, options){
             prefix = "', (" + line + ', (function(buf){return ' + input + '.then(function(';
           }
           js = output;
-          postfix = '){'+"buf.push('";
+          postfix = '){try {'+"buf.push('";
         }
       }());
       (function(){
         var split = searchAndSplit(js, '<-');
         if(split){
           prefix += split[0];
-          prefix += ";return all(buf).invoke('join','')});}([]))));"
+          prefix += ";return all(buf).invoke('join','')} catch (err) { rethrow(err, __stack.input, __stack.filename, __stack.lineno); } });}([]))));"
           js = split[1];
         }
       }());
