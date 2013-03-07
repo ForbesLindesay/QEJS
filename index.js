@@ -333,6 +333,7 @@ var compile = exports.compile = function(str, options){
       err.message += options.filename
         ? ' in ' + filename
         : ' while compiling qejs';
+      err.source = str;
     }
     throw err;
   }
