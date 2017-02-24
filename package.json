@@ -14,7 +14,7 @@
     "Asyncronous"
   ],
   "dependencies": {
-    "q": "0.8.x"
+    "q": "~1.4.1"
   },
   "devDependencies": {
     "mocha": "*",
