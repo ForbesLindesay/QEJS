@@ -265,7 +265,7 @@ var parse = exports.parse = function(str, options){
         var split = searchAndSplit(js, '<-');
         if(split){
           prefix += split[0];
-          prefix += ";return all(buf).invoke('join','')} catch (err) { rethrow(err, __stack.input, __stack.filename, __stack.lineno); } });}([]))));"
+          prefix += ";return all(buf).invoke('join','')} catch (err) { " + rethrow.name + "(err, __stack.input, __stack.filename, __stack.lineno); } });}([]))));"
           js = split[1];
         }
       }());
@@ -320,7 +320,7 @@ var compile = exports.compile = function(str, options){
     'try {',
     exports.parse(str, options),
     '} catch (err) {',
-    '  rethrow(err, __stack.input, __stack.filename, __stack.lineno);',
+    '  ' + rethrow.name + '(err, __stack.input, __stack.filename, __stack.lineno);',
     '}'
   ].join("\n");
   
