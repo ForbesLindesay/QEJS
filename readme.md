@@ -1,6 +1,8 @@
 [![Build Status](https://secure.travis-ci.org/jepso/QEJS.png?branch=master)](http://travis-ci.org/jepso/QEJS)
 # Asyncronous Embedded JavaScript Templates with Q
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/ForbesLindesay/QEJS.svg)](https://greenkeeper.io/)
+
 ![QEJS](http://i.imgur.com/WRIlB.png)
 
 This library impliments Embedded JavaScript with some asyncronous additions provided by Q.  It is broadly based on https://github.com/visionmedia/ejs and fully supports everything except filters.  For a full discussion of the reasoning behind this, see Features below.  The promises implimentation for ayncronous operations uses https://github.com/kriskowal/q so you'll need to make sure that all asyncronous functions/values you supply to the templates are 'thenables' so that they'll work with Q.  All that means in practice is that you need your promises to have a function `then` that you can call with a promise.
