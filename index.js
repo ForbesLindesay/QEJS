@@ -316,7 +316,6 @@ var compile = exports.compile = function(str, options){
   // Adds the fancy stack trace meta info
   str = [
     'var __stack = { lineno: 1, input: ' + input + ', filename: ' + filename + ' };',
-    rethrow.toString(),
     'try {',
     exports.parse(str, options),
     '} catch (err) {',
@@ -327,7 +326,7 @@ var compile = exports.compile = function(str, options){
   if (options.debug) console.log(str);
 
   try {
-    var fn = new Function('locals, escape, Q, all', str);
+    var fn = new Function('locals, escape, Q, all, rethrow', str);
   } catch (err) {
     if ('SyntaxError' == err.name) {
       err.message += options.filename
@@ -338,7 +337,7 @@ var compile = exports.compile = function(str, options){
     throw err;
   }
   return function(locals){
-    return fn.call(this, locals || {}, exports.escape, Q, all);
+    return fn.call(this, locals || {}, exports.escape, Q, all, rethrow);
   }
 };
 
