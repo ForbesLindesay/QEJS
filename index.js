@@ -265,7 +265,7 @@ var parse = exports.parse = function(str, options){
         var split = searchAndSplit(js, '<-');
         if(split){
           prefix += split[0];
-          prefix += ";return all(buf).invoke('join','')} catch (err) { " + rethrow.name + "(err, __stack.input, __stack.filename, __stack.lineno); } });}([]))));"
+          prefix += ";return all(buf).invoke('join','')} catch (err) { rethrow(err, __stack.input, __stack.filename, __stack.lineno); } });}([]))));"
           js = split[1];
         }
       }());
@@ -316,18 +316,17 @@ var compile = exports.compile = function(str, options){
   // Adds the fancy stack trace meta info
   str = [
     'var __stack = { lineno: 1, input: ' + input + ', filename: ' + filename + ' };',
-    rethrow.toString(),
     'try {',
     exports.parse(str, options),
     '} catch (err) {',
-    '  ' + rethrow.name + '(err, __stack.input, __stack.filename, __stack.lineno);',
+    '  rethrow(err, __stack.input, __stack.filename, __stack.lineno);',
     '}'
   ].join("\n");
   
   if (options.debug) console.log(str);
 
   try {
-    var fn = new Function('locals, escape, Q, all', str);
+    var fn = new Function('locals, escape, Q, all, rethrow', str);
   } catch (err) {
     if ('SyntaxError' == err.name) {
       err.message += options.filename
@@ -338,7 +337,7 @@ var compile = exports.compile = function(str, options){
     throw err;
   }
   return function(locals){
-    return fn.call(this, locals || {}, exports.escape, Q, all);
+    return fn.call(this, locals || {}, exports.escape, Q, all, rethrow);
   }
 };
 
